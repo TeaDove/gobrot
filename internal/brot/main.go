@@ -1,19 +1,24 @@
 package brot
 
 import (
-	"fmt"
 	"image"
 	"image/color"
-	"image/png"
 	"math"
-	"os"
 	"sync"
 
 	"github.com/teadove/awesome-fractals/internal/palette"
 )
 
-type Service struct {
-	WG            *sync.WaitGroup
+type Renderer struct {
+	wg            *sync.WaitGroup
+	xpos, ypos    float64
+	width, height int
+	maxIteration  int
+	escapeRadius  float64
+	colors        []color.RGBA
+}
+
+type Input struct {
 	ColorPalette  string
 	ColorStep     float64
 	XPos          float64
@@ -21,28 +26,28 @@ type Service struct {
 	Width, Height int
 	MaxIteration  int
 	EscapeRadius  float64
-	OutputFile    string
 }
 
-func (s *Service) Init() int {
-	return s.Height
-}
-
-func (s *Service) Run(done chan struct{}) {
-	if s.ColorStep < float64(s.MaxIteration) {
-		s.ColorStep = float64(s.MaxIteration)
-	}
-	colors := s.InterpolateColors()
-
-	if len(colors) == 0 {
-		return
+func New(input *Input) *Renderer {
+	r := Renderer{
+		wg:           &sync.WaitGroup{},
+		xpos:         input.XPos,
+		ypos:         input.YPos,
+		width:        input.Width,
+		height:       input.Height,
+		maxIteration: input.MaxIteration,
+		escapeRadius: input.EscapeRadius,
 	}
 
-	fmt.Print("Rendering image...")
-	s.Render(s.MaxIteration, colors, done)
+	if input.ColorStep < float64(input.MaxIteration) {
+		input.ColorStep = float64(input.MaxIteration)
+	}
+	r.colors = input.InterpolateColors()
+
+	return &r
 }
 
-func (s *Service) InterpolateColors() []color.RGBA {
+func (s *Input) InterpolateColors() []color.RGBA {
 	colors := palette.ColorPalettes[s.ColorPalette]
 
 	var factor float64
@@ -103,29 +108,29 @@ func (s *Service) InterpolateColors() []color.RGBA {
 	return interpolatedColors
 }
 
-func (s *Service) Render(maxIteration int, colors []color.RGBA, done chan struct{}) {
-	ratio := float64(s.Height) / float64(s.Width)
-	xmin, xmax := s.XPos-s.EscapeRadius/2.0, math.Abs(s.XPos+s.EscapeRadius/2.0)
-	ymin, ymax := s.YPos-s.EscapeRadius*ratio/2.0, math.Abs(s.YPos+s.EscapeRadius*ratio/2.0)
+func (s *Renderer) Render() *image.RGBA {
+	ratio := float64(s.height) / float64(s.width)
+	xmin, xmax := s.xpos-s.escapeRadius/2.0, math.Abs(s.xpos+s.escapeRadius/2.0)
+	ymin, ymax := s.ypos-s.escapeRadius*ratio/2.0, math.Abs(s.ypos+s.escapeRadius*ratio/2.0)
 
 	rgbaImageComplied := image.NewRGBA(
-		image.Rectangle{Min: image.Point{}, Max: image.Point{X: s.Width, Y: s.Height}},
+		image.Rectangle{Min: image.Point{}, Max: image.Point{X: s.width, Y: s.height}},
 	)
 
-	for iy := 0; iy < s.Height; iy++ {
-		s.WG.Add(1)
+	for iy := 0; iy < s.height; iy++ {
+		s.wg.Add(1)
 		go func(iy int) {
-			defer s.WG.Done()
+			defer s.wg.Done()
 
-			for ix := 0; ix < s.Width; ix++ {
-				x := xmin + (xmax-xmin)*float64(ix)/float64(s.Width-1)
-				y := ymin + (ymax-ymin)*float64(iy)/float64(s.Width-1)
-				norm, it := mandelIteration(x, y, maxIteration)
-				iteration := float64(maxIteration-it) + math.Log(norm)
+			for ix := 0; ix < s.width; ix++ {
+				x := xmin + (xmax-xmin)*float64(ix)/float64(s.width-1)
+				y := ymin + (ymax-ymin)*float64(iy)/float64(s.width-1)
+				norm, it := mandelIteration(x, y, s.maxIteration)
+				iteration := float64(s.maxIteration-it) + math.Log(norm)
 
-				if int(math.Abs(iteration)) < len(colors)-1 {
-					color1 := colors[int(math.Abs(iteration))]
-					color2 := colors[int(math.Abs(iteration))+1]
+				if int(math.Abs(iteration)) < len(s.colors)-1 {
+					color1 := s.colors[int(math.Abs(iteration))]
+					color2 := s.colors[int(math.Abs(iteration))+1]
 					compiledColor := linearInterpolation(
 						rgbaToUint(color1),
 						rgbaToUint(color2),
@@ -135,18 +140,11 @@ func (s *Service) Render(maxIteration int, colors []color.RGBA, done chan struct
 					rgbaImageComplied.Set(ix, iy, uint32ToRgba(compiledColor))
 				}
 			}
-			done <- struct{}{}
 		}(iy)
 	}
 
-	s.WG.Wait()
-
-	// TODO add err check
-	output, _ := os.Create(s.OutputFile)
-	// TODO add err check
-	_ = png.Encode(output, rgbaImageComplied)
-
-	done <- struct{}{}
+	s.wg.Wait()
+	return rgbaImageComplied
 }
 
 func cosineInterpolation(c1, c2, mu float64) float64 {
