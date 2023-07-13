@@ -67,14 +67,5 @@ func Run() {
 		}
 	}()
 
-	if service.ColorStep < float64(service.MaxIteration) {
-		service.ColorStep = float64(service.MaxIteration)
-	}
-	colors := service.InterpolateColors(&service.ColorPalette, service.ColorStep)
-
-	if len(colors) > 0 {
-		fmt.Print("Rendering image...")
-		service.Render(service.MaxIteration, colors, done)
-	}
-	time.Sleep(time.Second)
+	service.Run(done)
 }

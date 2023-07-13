@@ -8,42 +8,38 @@ type Color struct {
 	Step  float64
 	Color color.Color
 }
+type colorMap map[string][]Color
 
-type ColorMap struct {
-	Keyword string
-	Colors  []Color
-}
-
-var ColorPalettes = []ColorMap{
-	{Keyword: "AfternoonBlue", Colors: []Color{
+var ColorPalettes = colorMap{
+	"AfternoonBlue": []Color{
 		{Color: color.RGBA{R: 0x93, G: 0xd2, B: 0xca, A: 0xff}},
 		{Step: 0.2, Color: color.RGBA{R: 0x6c, G: 0x98, B: 0xb8, A: 0xff}},
 		{Step: 0.5, Color: color.RGBA{R: 0x38, G: 0x68, B: 0x85, A: 0xff}},
 		{Step: 0.8, Color: color.RGBA{R: 0x17, G: 0x4f, B: 0x72, A: 0xff}},
 		{Step: 1.0, Color: color.RGBA{R: 0x08, G: 0x2a, B: 0x4f, A: 0xff}},
-	}},
-	{Keyword: "SummerBeach", Colors: []Color{
+	},
+	"SummerBeach": []Color{
 		{Color: color.RGBA{R: 0xff, G: 0xf0, B: 0x94, A: 0xff}},
 		{Step: 0.3, Color: color.RGBA{R: 0xff, G: 0xb7, B: 0x2d, A: 0xff}},
 		{Step: 0.6, Color: color.RGBA{R: 0xff, G: 0x8d, A: 0xff}},
 		{Step: 0.8, Color: color.RGBA{R: 0x2d, G: 0x69, B: 0xae, A: 0xff}},
 		{Step: 1.0, Color: color.RGBA{R: 0x1e, G: 0x2c, B: 0x60, A: 0xff}},
-	}},
-	{Keyword: "Biochimist", Colors: []Color{
+	},
+	"Biochimist": []Color{
 		{Color: color.RGBA{R: 0x51, G: 0x99, B: 0x25, A: 0xff}},
 		{Color: color.RGBA{R: 0x50, G: 0xa6, B: 0x1c, A: 0xff}},
 		{Color: color.RGBA{R: 0x4b, G: 0xb8, B: 0x0b, A: 0xff}},
 		{Color: color.RGBA{R: 0x4d, G: 0xcd, A: 0xff}},
 		{Color: color.RGBA{R: 0x53, G: 0xdf, A: 0xff}},
-	}},
-	{Keyword: "Fiesta", Colors: []Color{
+	},
+	"Fiesta": []Color{
 		{Color: color.RGBA{R: 0x03, G: 0x67, B: 0xa6, A: 0xff}},
 		{Color: color.RGBA{R: 0x04, G: 0xad, B: 0xbf, A: 0xff}},
 		{Color: color.RGBA{R: 0x93, G: 0xa6, B: 0x03, A: 0xff}},
 		{Color: color.RGBA{R: 0xe5, G: 0xce, B: 0x1b, A: 0xff}},
 		{Color: color.RGBA{R: 0xc8, G: 0x3f, B: 0x2a, A: 0xff}},
-	}},
-	{Keyword: "Hippi", Colors: []Color{
+	},
+	"Hippi": []Color{
 		{Color: color.RGBA{G: 0x04, B: 0x0f, A: 0xff}},
 		{Color: color.RGBA{R: 0x03, G: 0x26, B: 0x28, A: 0xff}},
 		{Color: color.RGBA{R: 0x07, G: 0x3e, B: 0x1e, A: 0xff}},
@@ -60,8 +56,8 @@ var ColorPalettes = []ColorMap{
 		{Color: color.RGBA{R: 0xd7, G: 0xb5, B: 0xf3, A: 0xff}},
 		{Color: color.RGBA{R: 0xfd, G: 0xd6, B: 0xf6, A: 0xff}},
 		{Color: color.RGBA{R: 0xff, G: 0xf0, B: 0xf2, A: 0xff}},
-	}},
-	{Keyword: "Vivid", Colors: []Color{
+	},
+	"Vivid": []Color{
 		{Color: color.RGBA{R: 0x02, G: 0x3b, B: 0x2b, A: 0xff}},
 		{Color: color.RGBA{R: 0x36, G: 0x34, B: 0x48, A: 0xff}},
 		{Color: color.RGBA{R: 0x04, G: 0x8b, B: 0x64, A: 0xff}},
@@ -84,8 +80,8 @@ var ColorPalettes = []ColorMap{
 		{Color: color.RGBA{R: 0x11, G: 0x03, B: 0x12, A: 0xff}},
 		{Color: color.RGBA{R: 0x33, G: 0x08, B: 0x35, A: 0xff}},
 		{Color: color.RGBA{R: 0xf5, G: 0xca, B: 0xf7, A: 0xff}},
-	}},
-	{Keyword: "Plan9", Colors: []Color{
+	},
+	"Plan9": []Color{
 		{Color: color.RGBA{A: 0xff}},
 		{Color: color.RGBA{B: 0x44, A: 0xff}},
 		{Color: color.RGBA{B: 0x88, A: 0xff}},
@@ -342,5 +338,5 @@ var ColorPalettes = []ColorMap{
 		{Color: color.RGBA{R: 0xff, G: 0xff, B: 0x55, A: 0xff}},
 		{Color: color.RGBA{R: 0xff, G: 0xff, B: 0xaa, A: 0xff}},
 		{Color: color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xff}},
-	}},
+	},
 }
