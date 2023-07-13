@@ -24,16 +24,22 @@ type Service struct {
 	OutputFile    string
 }
 
+func (s *Service) Init() int {
+	return s.Height
+}
+
 func (s *Service) Run(done chan struct{}) {
 	if s.ColorStep < float64(s.MaxIteration) {
 		s.ColorStep = float64(s.MaxIteration)
 	}
 	colors := s.InterpolateColors()
 
-	if len(colors) > 0 {
-		fmt.Print("Rendering image...")
-		s.Render(s.MaxIteration, colors, done)
+	if len(colors) == 0 {
+		return
 	}
+
+	fmt.Print("Rendering image...")
+	s.Render(s.MaxIteration, colors, done)
 }
 
 func (s *Service) InterpolateColors() []color.RGBA {
@@ -102,7 +108,7 @@ func (s *Service) Render(maxIteration int, colors []color.RGBA, done chan struct
 	xmin, xmax := s.XPos-s.EscapeRadius/2.0, math.Abs(s.XPos+s.EscapeRadius/2.0)
 	ymin, ymax := s.YPos-s.EscapeRadius*ratio/2.0, math.Abs(s.YPos+s.EscapeRadius*ratio/2.0)
 
-	rgbaImage := image.NewRGBA(
+	rgbaImageComplied := image.NewRGBA(
 		image.Rectangle{Min: image.Point{}, Max: image.Point{X: s.Width, Y: s.Height}},
 	)
 
@@ -126,9 +132,10 @@ func (s *Service) Render(maxIteration int, colors []color.RGBA, done chan struct
 						uint32(iteration),
 					)
 
-					rgbaImage.Set(ix, iy, uint32ToRgba(compiledColor))
+					rgbaImageComplied.Set(ix, iy, uint32ToRgba(compiledColor))
 				}
 			}
+			done <- struct{}{}
 		}(iy)
 	}
 
@@ -137,7 +144,7 @@ func (s *Service) Render(maxIteration int, colors []color.RGBA, done chan struct
 	// TODO add err check
 	output, _ := os.Create(s.OutputFile)
 	// TODO add err check
-	_ = png.Encode(output, rgbaImage)
+	_ = png.Encode(output, rgbaImageComplied)
 
 	done <- struct{}{}
 }

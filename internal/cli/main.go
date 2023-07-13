@@ -2,12 +2,11 @@ package cli
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"runtime/pprof"
 	"sync"
-	"time"
 
+	"github.com/schollz/progressbar/v3"
 	"github.com/teadove/awesome-fractals/internal/brot"
 )
 
@@ -64,20 +63,20 @@ func Run() {
 	}
 
 	done := make(chan struct{})
-	ticker := time.NewTicker(time.Millisecond * 100)
+	iterations := service.Init()
 
 	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				fmt.Print(".")
-			case <-done:
-				ticker.Stop()
-				fmt.Printf("\n\nMandelbrot set rendered into `%s`\n", service.OutputFile)
+		bar := progressbar.Default(int64(iterations))
+		for i := 0; i <= iterations; i++ {
+			<-done
+			err := bar.Add(1)
+			if err != nil {
+				println(err.Error())
 			}
 		}
 	}()
 
 	service.Run(done)
+
 	pprof.StopCPUProfile()
 }
