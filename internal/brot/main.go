@@ -137,7 +137,7 @@ func (s *Service) Render(maxIteration int, colors []color.RGBA, done chan struct
 	// TODO add err check
 	output, _ := os.Create(s.OutputFile)
 	// TODO add err check
-	png.Encode(output, rgbaImage)
+	_ = png.Encode(output, rgbaImage)
 
 	done <- struct{}{}
 }
@@ -152,7 +152,7 @@ func linearInterpolation(c1, c2, mu uint32) uint32 {
 }
 
 func mandelIteration(cx, cy float64, maxIter int) (float64, int) {
-	var x, y, xx, yy = 0.0, 0.0, 0.0, 0.0
+	x, y, xx, yy := 0.0, 0.0, 0.0, 0.0
 
 	for i := 0; i < maxIter; i++ {
 		xy := x * y

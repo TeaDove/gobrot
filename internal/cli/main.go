@@ -3,6 +3,8 @@ package cli
 import (
 	"flag"
 	"fmt"
+	"os"
+	"runtime/pprof"
 	"sync"
 	"time"
 
@@ -52,6 +54,15 @@ func init() {
 }
 
 func Run() {
+	file, err := os.OpenFile("main.prof", os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
+	}
+	err = pprof.StartCPUProfile(file)
+	if err != nil {
+		panic(err)
+	}
+
 	done := make(chan struct{})
 	ticker := time.NewTicker(time.Millisecond * 100)
 
@@ -68,4 +79,5 @@ func Run() {
 	}()
 
 	service.Run(done)
+	pprof.StopCPUProfile()
 }
