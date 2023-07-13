@@ -8,20 +8,19 @@ import (
 	"os"
 	"sync"
 
-	"github.com/teadove/gobrot/internal/palette"
+	"github.com/teadove/awesome-fractals/internal/palette"
 )
 
 type Service struct {
-	WG              *sync.WaitGroup
-	ColorPalette    string
-	ColorStep       float64
-	XPos            float64
-	YPos            float64
-	Width, Height   int
-	ImageSmoothness int
-	MaxIteration    int
-	EscapeRadius    float64
-	OutputFile      string
+	WG            *sync.WaitGroup
+	ColorPalette  string
+	ColorStep     float64
+	XPos          float64
+	YPos          float64
+	Width, Height int
+	MaxIteration  int
+	EscapeRadius  float64
+	OutputFile    string
 }
 
 func (s *Service) InterpolateColors(paletteCode *string, numberOfColors float64) []color.RGBA {
@@ -92,8 +91,6 @@ func (s *Service) InterpolateColors(paletteCode *string, numberOfColors float64)
 }
 
 func (s *Service) Render(maxIteration int, colors []color.RGBA, done chan struct{}) {
-	s.Width *= s.ImageSmoothness
-	s.Height *= s.ImageSmoothness
 	ratio := float64(s.Height) / float64(s.Width)
 	xmin, xmax := s.XPos-s.EscapeRadius/2.0, math.Abs(s.XPos+s.EscapeRadius/2.0)
 	ymin, ymax := s.YPos-s.EscapeRadius*ratio/2.0, math.Abs(s.YPos+s.EscapeRadius*ratio/2.0)
@@ -148,7 +145,7 @@ func linearInterpolation(c1, c2, mu uint32) uint32 {
 }
 
 func mandelIteration(cx, cy float64, maxIter int) (float64, int) {
-	var x, y, xx, yy float64 = 0.0, 0.0, 0.0, 0.0
+	var x, y, xx, yy = 0.0, 0.0, 0.0, 0.0
 
 	for i := 0; i < maxIter; i++ {
 		xy := x * y

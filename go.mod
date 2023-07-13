@@ -1,4 +1,4 @@
-module github.com/teadove/gobrot
+module github.com/teadove/awesome-fractals
 
 go 1.20
 

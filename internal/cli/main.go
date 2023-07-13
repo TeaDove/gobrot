@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/teadove/gobrot/internal/brot"
+	"github.com/teadove/awesome-fractals/internal/brot"
 )
 
 var service brot.Service
@@ -20,8 +20,8 @@ func init() {
 		6000,
 		"Color smooth step. Value should be greater than iteration count, otherwise the value will be adjusted to the iteration count.",
 	)
-	flag.IntVar(&service.Width, "width", 1024, "Rendered image width")
-	flag.IntVar(&service.Height, "height", 768, "Rendered image height")
+	flag.IntVar(&service.Width, "width", 1000, "Rendered image width")
+	flag.IntVar(&service.Height, "height", 1000, "Rendered image height")
 	flag.Float64Var(
 		&service.XPos,
 		"xpos",
@@ -36,12 +36,6 @@ func init() {
 	)
 	flag.Float64Var(&service.EscapeRadius, "radius", .125689, "Escape Radius")
 	flag.IntVar(&service.MaxIteration, "iteration", 800, "Iteration count")
-	flag.IntVar(
-		&service.ImageSmoothness,
-		"smoothness",
-		8,
-		"The rendered mandelbrot set smoothness. For a more detailded and clear image use higher numbers. For 4xAA (AA = antialiasing) use -smoothness 4",
-	)
 	flag.StringVar(
 		&service.ColorPalette,
 		"palette",
