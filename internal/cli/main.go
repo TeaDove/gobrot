@@ -1,10 +1,16 @@
 package cli
 
 import (
+	"bytes"
 	"flag"
+	"fmt"
+	"image/jpeg"
 	"image/png"
 	"os"
 	"runtime/pprof"
+
+	vidio "github.com/AlexEidt/Vidio"
+	"github.com/schollz/progressbar/v3"
 
 	"github.com/teadove/awesome-fractals/internal/brot"
 )
@@ -63,10 +69,11 @@ func Run() {
 	}
 
 	//  done := make(chan struct{})
-	//  iterations := 2000
+	iterations := 10
 	//
 	//  go func() {
-	//	bar := progressbar.Default(int64(iterations))
+
+	bar := progressbar.Default(int64(iterations))
 	//	for i := 0; i <= iterations; i++ {
 	//		<-done
 	//		err := bar.Add(1)
@@ -76,12 +83,37 @@ func Run() {
 	//	}
 	//  }()
 
-	image := service.Render()
+	video, err := vidio.NewVideoWriter("video.mp4", 800, 800, &vidio.Options{})
+	if err != nil {
+		panic(err)
+	}
 
-	//// TODO add err check
-	output, _ := os.Create("file.png")
-	//// TODO add err check
-	_ = png.Encode(output, image)
+	for i := 0; i < 10; i++ {
+		img := service.Render()
+		service.EscapeRadius -= 0.01
+
+		buf := new(bytes.Buffer)
+		err := jpeg.Encode(buf, img, nil)
+		if err != nil {
+			panic(err)
+		}
+		sendS3 := buf.Bytes()
+
+		err = video.Write(sendS3)
+		if err != nil {
+			panic(err)
+		}
+
+		// TODO add err check
+		output, _ := os.Create(fmt.Sprintf("file_%d.png", i))
+		//// TODO add err check
+		_ = png.Encode(output, img)
+
+		err = bar.Add(1)
+		if err != nil {
+			println(err.Error())
+		}
+	}
 
 	pprof.StopCPUProfile()
 }

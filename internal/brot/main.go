@@ -14,7 +14,7 @@ type Renderer struct {
 	xpos, ypos    float64
 	width, height int
 	maxIteration  int
-	escapeRadius  float64
+	EscapeRadius  float64
 	colors        []color.RGBA
 }
 
@@ -36,7 +36,7 @@ func New(input *Input) *Renderer {
 		width:        input.Width,
 		height:       input.Height,
 		maxIteration: input.MaxIteration,
-		escapeRadius: input.EscapeRadius,
+		EscapeRadius: input.EscapeRadius,
 	}
 
 	if input.ColorStep < float64(input.MaxIteration) {
@@ -110,8 +110,8 @@ func (s *Input) InterpolateColors() []color.RGBA {
 
 func (s *Renderer) Render() *image.RGBA {
 	ratio := float64(s.height) / float64(s.width)
-	xmin, xmax := s.xpos-s.escapeRadius/2.0, math.Abs(s.xpos+s.escapeRadius/2.0)
-	ymin, ymax := s.ypos-s.escapeRadius*ratio/2.0, math.Abs(s.ypos+s.escapeRadius*ratio/2.0)
+	xmin, xmax := s.xpos-s.EscapeRadius/2.0, math.Abs(s.xpos+s.EscapeRadius/2.0)
+	ymin, ymax := s.ypos-s.EscapeRadius*ratio/2.0, math.Abs(s.ypos+s.EscapeRadius*ratio/2.0)
 
 	rgbaImageComplied := image.NewRGBA(
 		image.Rectangle{Min: image.Point{}, Max: image.Point{X: s.width, Y: s.height}},
@@ -128,17 +128,18 @@ func (s *Renderer) Render() *image.RGBA {
 				norm, it := mandelIteration(x, y, s.maxIteration)
 				iteration := float64(s.maxIteration-it) + math.Log(norm)
 
-				if int(math.Abs(iteration)) < len(s.colors)-1 {
-					color1 := s.colors[int(math.Abs(iteration))]
-					color2 := s.colors[int(math.Abs(iteration))+1]
-					compiledColor := linearInterpolation(
-						rgbaToUint(color1),
-						rgbaToUint(color2),
-						uint32(iteration),
-					)
-
-					rgbaImageComplied.Set(ix, iy, uint32ToRgba(compiledColor))
+				if int(math.Abs(iteration)) >= len(s.colors)-1 {
+					continue
 				}
+				color1 := s.colors[int(math.Abs(iteration))]
+				color2 := s.colors[int(math.Abs(iteration))+1]
+				compiledColor := linearInterpolation(
+					rgbaToUint(color1),
+					rgbaToUint(color2),
+					uint32(iteration),
+				)
+
+				rgbaImageComplied.Set(ix, iy, uint32ToRgba(compiledColor))
 			}
 		}(iy)
 	}
