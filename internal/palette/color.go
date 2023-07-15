@@ -10,6 +10,15 @@ type Color struct {
 }
 type colorMap map[string][]Color
 
+func GetPaletteNames() []string {
+	names := make([]string, 0, 10)
+	for key := range ColorPalettes {
+		names = append(names, key)
+	}
+
+	return names
+}
+
 var ColorPalettes = colorMap{
 	"AfternoonBlue": []Color{
 		{Color: color.RGBA{R: 0x93, G: 0xd2, B: 0xca, A: 0xff}},

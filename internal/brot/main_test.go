@@ -17,7 +17,7 @@ func TestUnit_Brot_Render_Ok(t *testing.T) {
 	image, err := png.Decode(bytes.NewReader(file))
 	utils.Check(err)
 
-	renderer := New(&Input{
+	renderer, _ := New(&Input{
 		ColorPalette: "Plan9",
 		ColorStep:    6000,
 		XPos:         -0.00275,
@@ -27,7 +27,7 @@ func TestUnit_Brot_Render_Ok(t *testing.T) {
 		MaxIteration: 800,
 		EscapeRadius: .125689,
 	})
-	imageCompile := renderer.Render()
+	imageCompile := renderer.Render(nil)
 
 	assert.Equal(t, image, imageCompile)
 }

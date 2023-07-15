@@ -10,7 +10,6 @@ import (
 )
 
 type Renderer struct {
-	wg            *sync.WaitGroup
 	xpos, ypos    float64
 	width, height int
 	maxIteration  int
@@ -20,7 +19,7 @@ type Renderer struct {
 
 type Input struct {
 	ColorPalette  string
-	ColorStep     float64
+	ColorStep     int
 	XPos          float64
 	YPos          float64
 	Width, Height int
@@ -28,9 +27,8 @@ type Input struct {
 	EscapeRadius  float64
 }
 
-func New(input *Input) *Renderer {
+func New(input *Input) (*Renderer, int) {
 	r := Renderer{
-		wg:           &sync.WaitGroup{},
 		xpos:         input.XPos,
 		ypos:         input.YPos,
 		width:        input.Width,
@@ -39,12 +37,12 @@ func New(input *Input) *Renderer {
 		EscapeRadius: input.EscapeRadius,
 	}
 
-	if input.ColorStep < float64(input.MaxIteration) {
-		input.ColorStep = float64(input.MaxIteration)
+	if input.ColorStep < input.MaxIteration {
+		input.ColorStep = input.MaxIteration
 	}
 	r.colors = input.InterpolateColors()
 
-	return &r
+	return &r, r.height
 }
 
 func (s *Input) InterpolateColors() []color.RGBA {
@@ -56,7 +54,7 @@ func (s *Input) InterpolateColors() []color.RGBA {
 	var interpolated []uint32
 	var interpolatedColors []color.RGBA
 
-	factor = 1.0 / s.ColorStep
+	factor = 1.0 / float64(s.ColorStep)
 	for index, col := range colors {
 		if col.Step == 0.0 && index != 0 {
 			stepRatio := float64(index+1) / float64(len(colors))
@@ -108,7 +106,7 @@ func (s *Input) InterpolateColors() []color.RGBA {
 	return interpolatedColors
 }
 
-func (s *Renderer) Render() *image.RGBA {
+func (s *Renderer) Render(done chan struct{}) *image.RGBA {
 	ratio := float64(s.height) / float64(s.width)
 	xmin, xmax := s.xpos-s.EscapeRadius/2.0, math.Abs(s.xpos+s.EscapeRadius/2.0)
 	ymin, ymax := s.ypos-s.EscapeRadius*ratio/2.0, math.Abs(s.ypos+s.EscapeRadius*ratio/2.0)
@@ -117,10 +115,16 @@ func (s *Renderer) Render() *image.RGBA {
 		image.Rectangle{Min: image.Point{}, Max: image.Point{X: s.width, Y: s.height}},
 	)
 
+	wg := sync.WaitGroup{}
 	for iy := 0; iy < s.height; iy++ {
-		s.wg.Add(1)
+		wg.Add(1)
 		go func(iy int) {
-			defer s.wg.Done()
+			defer wg.Done()
+			defer func() {
+				if done != nil {
+					done <- struct{}{}
+				}
+			}()
 
 			for ix := 0; ix < s.width; ix++ {
 				x := xmin + (xmax-xmin)*float64(ix)/float64(s.width-1)
@@ -144,7 +148,7 @@ func (s *Renderer) Render() *image.RGBA {
 		}(iy)
 	}
 
-	s.wg.Wait()
+	wg.Wait()
 	return rgbaImageComplied
 }
 
