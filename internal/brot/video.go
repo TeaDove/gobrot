@@ -1,0 +1,5 @@
+package brot
+
+func RenderVideo() {
+
+}

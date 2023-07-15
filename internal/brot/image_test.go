@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/teadove/awesome-fractals/internal/palette"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/teadove/awesome-fractals/internal/utils"
 )
@@ -17,8 +19,8 @@ func TestUnit_Brot_Render_Ok(t *testing.T) {
 	image, err := png.Decode(bytes.NewReader(file))
 	utils.Check(err)
 
-	renderer, _ := New(&Input{
-		ColorPalette: "Plan9",
+	input, _ := NewInputFromBuilderInput(&BuilderInput{
+		Colors:       palette.ColorPalettes["Plan9"],
 		ColorStep:    6000,
 		XPos:         -0.00275,
 		YPos:         0.78912,
@@ -27,7 +29,7 @@ func TestUnit_Brot_Render_Ok(t *testing.T) {
 		MaxIteration: 800,
 		EscapeRadius: .125689,
 	})
-	imageCompile := renderer.Render(nil)
+	imageCompile := Render(input)
 
 	assert.Equal(t, image, imageCompile)
 }

@@ -16,13 +16,13 @@ import (
 func drawImage(cCtx *cli.Context) error {
 	runtime.GOMAXPROCS(cCtx.Int(maxprocsFlag.Name))
 
-	_, ok := palette.ColorPalettes[cCtx.String(paletteFlage.Name)]
+	colors, ok := palette.ColorPalettes[cCtx.String(paletteFlage.Name)]
 	if !ok {
 		return cli.Exit("Palette not found", 1)
 	}
 
-	input := brot.Input{
-		ColorPalette: cCtx.String(paletteFlage.Name),
+	buildInput := brot.BuilderInput{
+		Colors:       colors,
 		ColorStep:    cCtx.Int(stepFlag.Name),
 		XPos:         cCtx.Float64(xposFlag.Name),
 		YPos:         cCtx.Float64(yposFlag.Name),
@@ -32,7 +32,7 @@ func drawImage(cCtx *cli.Context) error {
 		EscapeRadius: cCtx.Float64(radiusFlag.Name),
 	}
 
-	service, iterations := brot.New(&input)
+	input, iterations := brot.NewInputFromBuilderInput(&buildInput)
 	done := make(chan struct{}, iterations)
 	go func() {
 		bar := progressbar.Default(int64(iterations))
@@ -44,7 +44,7 @@ func drawImage(cCtx *cli.Context) error {
 			}
 		}
 	}()
-	img := service.Render(done)
+	img := brot.Render(input)
 
 	output, err := os.Create(cCtx.String(imageFilenameFlag.Name))
 	if err != nil {

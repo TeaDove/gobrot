@@ -42,6 +42,19 @@ var (
 		Value: "fractal.png",
 		Usage: "Path to save image",
 	}
+	videoFilenameFlag = &cli.StringFlag{
+		Name:  "filename",
+		Value: "fractal.avi",
+		Usage: "Path to save image",
+	}
+	framesFlag = &cli.IntFlag{
+		Name:  "frames",
+		Value: 90,
+		Usage: "Amount of frames, to create in video",
+	}
+	fpsFlag = &cli.IntFlag{Name: "fps",
+		Value: 30,
+		Usage: "Frames per second"}
 
 	maxprocsFlag = &cli.IntFlag{
 		Name:  "maxprocs",
@@ -72,7 +85,6 @@ func Run() {
 				Name:   "video",
 				Action: drawVideo,
 				Flags: []cli.Flag{
-					imageFilenameFlag,
 					widthFlag,
 					heightFlag,
 					stepFlag,
@@ -81,6 +93,9 @@ func Run() {
 					radiusFlag,
 					iterationFlag,
 					paletteFlage,
+					framesFlag,
+					fpsFlag,
+					videoFilenameFlag,
 				},
 			},
 		}}
@@ -90,42 +105,4 @@ func Run() {
 	if err != nil {
 		fmt.Printf("Error: %s", err.Error())
 	}
-
-	//  done := make(chan struct{})
-	//  iterations := 10
-	//
-	//  go func() {
-
-	//  video, err := vidio.NewVideoWriter("video.mp4", 800, 800, &vidio.Options{})
-	//  if err != nil {
-	//	panic(err)
-	//  }
-	//
-	//  for i := 0; i < 10; i++ {
-	//	img := service.Render()
-	//	service.EscapeRadius -= 0.01
-	//
-	//	buf := new(bytes.Buffer)
-	//	err := jpeg.Encode(buf, img, nil)
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//	sendS3 := buf.Bytes()
-	//
-	//	err = video.Write(sendS3)
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//
-	//	// TODO add err check
-	//	output, _ := os.Create(fmt.Sprintf("file_%d.png", i))
-	//	//// TODO add err check
-	//	_ = png.Encode(output, img)
-	//
-	//	err = bar.Add(1)
-	//	if err != nil {
-	//		println(err.Error())
-	//	}
-	//  }
-
 }

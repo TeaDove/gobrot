@@ -3,6 +3,7 @@ module github.com/teadove/awesome-fractals
 go 1.20
 
 require (
+	github.com/icza/mjpeg v0.0.0-20230330134156-38318e5ab8f4
 	github.com/rs/zerolog v1.29.1
 	github.com/schollz/progressbar/v3 v3.13.1
 	github.com/stretchr/testify v1.8.4

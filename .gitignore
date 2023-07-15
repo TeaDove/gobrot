@@ -1,5 +1,7 @@
 ### Builds ###
-gobrot-v*
+fractal-v*
+fractal.avi
+fractal.png
 
 ### SAM BUILD ###
 **/.aws-sam
