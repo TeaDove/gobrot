@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/teadove/awesome-fractals/internal/palette"
@@ -41,28 +42,21 @@ var (
 		Value: "fractal.png",
 		Usage: "Path to save image",
 	}
+
+	maxprocsFlag = &cli.IntFlag{
+		Name:  "maxprocs",
+		Usage: "max amount of processes to use, by default is amount of cores in CPU munis one",
+		Value: runtime.NumCPU() - 1,
+	}
 )
 
 func Run() {
 	captureInterrupt()
 
-	app := &cli.App{Commands: []*cli.Command{{
-		Name:   "image",
-		Action: drawImage,
-		Flags: []cli.Flag{
-			imageFilenameFlag,
-			widthFlag,
-			heightFlag,
-			stepFlag,
-			xposFlag,
-			yposFlag,
-			radiusFlag,
-			iterationFlag,
-			paletteFlage,
-		}},
-		{
-			Name:   "video",
-			Action: drawVideo,
+	app := &cli.App{Flags: []cli.Flag{maxprocsFlag},
+		Commands: []*cli.Command{{
+			Name:   "image",
+			Action: drawImage,
 			Flags: []cli.Flag{
 				imageFilenameFlag,
 				widthFlag,
@@ -73,9 +67,23 @@ func Run() {
 				radiusFlag,
 				iterationFlag,
 				paletteFlage,
+			}},
+			{
+				Name:   "video",
+				Action: drawVideo,
+				Flags: []cli.Flag{
+					imageFilenameFlag,
+					widthFlag,
+					heightFlag,
+					stepFlag,
+					xposFlag,
+					yposFlag,
+					radiusFlag,
+					iterationFlag,
+					paletteFlage,
+				},
 			},
-		},
-	}}
+		}}
 
 	err := app.Run(os.Args)
 
