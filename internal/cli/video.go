@@ -15,6 +15,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+func getStepFloat64(start, end float64, count int) float64 {
+	return (end - start) / float64(count)
+}
+
+func getStepInt(start, end, count int) int {
+	return (end - start) / count
+}
+
 func drawVideo(cCtx *cli.Context) error {
 	runtime.GOMAXPROCS(cCtx.Int(maxprocsFlag.Name))
 
@@ -23,29 +31,48 @@ func drawVideo(cCtx *cli.Context) error {
 		return cli.Exit("Palette not found", 1)
 	}
 
+	xPos, xPosEnd := cCtx.Float64(xposFlag.Name), cCtx.Float64(xposEndFlag.Name)
+	yPos, yPosEnd := cCtx.Float64(yposFlag.Name), cCtx.Float64(yposEndFlag.Name)
+	colorStep, _ := cCtx.Int(stepFlag.Name), cCtx.Int(stepEndFlag.Name)
+	escapeRadius, escapeRadiusEnd := cCtx.Float64(radiusFlag.Name), cCtx.Float64(radiusEndFlag.Name)
+	iteration, iterationEnd := cCtx.Int(iterationFlag.Name), cCtx.Int(iterationEndFlag.Name)
+
 	buildInput := brot.BuilderInput{
 		Colors:       colors,
-		ColorStep:    cCtx.Int(stepFlag.Name),
-		XPos:         cCtx.Float64(xposFlag.Name),
-		YPos:         cCtx.Float64(yposFlag.Name),
+		ColorStep:    colorStep,
+		XPos:         xPos,
+		YPos:         yPos,
 		Width:        cCtx.Int(widthFlag.Name),
 		Height:       cCtx.Int(heightFlag.Name),
-		MaxIteration: cCtx.Int(iterationFlag.Name),
-		EscapeRadius: cCtx.Float64(radiusFlag.Name),
+		MaxIteration: iteration,
+		EscapeRadius: escapeRadius,
 	}
 
-	iterations := cCtx.Int(framesFlag.Name)
+	frames := cCtx.Int(framesFlag.Name)
 	input, _ := brot.NewInputFromBuilderInput(&buildInput)
-	bar := progressbar.Default(int64(iterations))
 
 	aw, err := mjpeg.New(cCtx.String(videoFilenameFlag.Name), int32(cCtx.Int(widthFlag.Name)), int32(cCtx.Int(heightFlag.Name)), int32(cCtx.Int(fpsFlag.Name)))
 	if err != nil {
 		return cli.Exit(fmt.Sprintf("Error creating video file: %s", err.Error()), 1)
 	}
 
-	for i := 0; i < iterations; i++ {
+	xposStep := getStepFloat64(xPos, xPosEnd, frames)
+	yposStep := getStepFloat64(yPos, yPosEnd, frames)
+	escapeRadiusStep := getStepFloat64(escapeRadius, escapeRadiusEnd, frames)
+	maxIterationStep := getStepInt(iteration, iterationEnd, frames)
+	log.Info().Str("status", "start.compiling.video").
+		Float64("xpos_step", xposStep).
+		Float64("ypos_step", yposStep).
+		Float64("escape_radius_step", escapeRadiusStep).
+		Int("max_iteration_step", maxIterationStep).Send()
+	bar := progressbar.Default(int64(frames))
+	for i := 0; i < frames; i++ {
+		input.XPos += xposStep
+		input.YPos += yposStep
+		input.EscapeRadius += escapeRadiusStep
+		input.MaxIteration += maxIterationStep
+
 		img := brot.Render(input)
-		input.XPos -= 0.01
 
 		buf := &bytes.Buffer{}
 		err = jpeg.Encode(buf, img, nil)

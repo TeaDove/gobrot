@@ -1,5 +1,0 @@
-package brot
-
-func RenderVideo() {
-
-}

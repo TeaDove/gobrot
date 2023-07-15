@@ -20,9 +20,19 @@ var (
 			"otherwise the value will be adjusted to the iteration count.",
 		Value: 6_000,
 	}
+	stepEndFlag = &cli.IntFlag{
+		Name:  "step-end",
+		Usage: "step end value",
+		Value: 6_000,
+	}
 	xposFlag = &cli.Float64Flag{
 		Name:  "xpos",
 		Usage: "Point position on the real axis (defined on `x` axis)",
+		Value: -0.00275,
+	}
+	xposEndFlag = &cli.Float64Flag{
+		Name:  "xpos-end",
+		Usage: "xpos end value",
 		Value: -0.00275,
 	}
 	yposFlag = &cli.Float64Flag{
@@ -30,9 +40,16 @@ var (
 		Usage: "Point position on the imaginary axis (defined on `y` axis)",
 		Value: 0.78912,
 	}
-	radiusFlag    = &cli.Float64Flag{Name: "radius", Usage: "Escape Radius", Value: .125689}
-	iterationFlag = &cli.IntFlag{Name: "iteration", Value: 800, Usage: "Iteration count"}
-	paletteFlage  = &cli.StringFlag{
+	yposEndFlag = &cli.Float64Flag{
+		Name:  "ypos-end",
+		Usage: "ypos end value",
+		Value: 0.78912,
+	}
+	radiusFlag       = &cli.Float64Flag{Name: "radius", Usage: "Escape Radius", Value: .125689}
+	radiusEndFlag    = &cli.Float64Flag{Name: "radius-end", Usage: "radius end value", Value: .125689}
+	iterationFlag    = &cli.IntFlag{Name: "iteration", Value: 800, Usage: "Iteration count"}
+	iterationEndFlag = &cli.IntFlag{Name: "iteration-end", Value: 800, Usage: "iteration end value"}
+	paletteFlage     = &cli.StringFlag{
 		Name:  "palette",
 		Value: "Hippi",
 		Usage: strings.Join(palette.GetPaletteNames(), " | "),
@@ -87,11 +104,18 @@ func Run() {
 				Flags: []cli.Flag{
 					widthFlag,
 					heightFlag,
+
 					stepFlag,
+					stepEndFlag,
 					xposFlag,
+					xposEndFlag,
 					yposFlag,
+					yposEndFlag,
 					radiusFlag,
+					radiusEndFlag,
 					iterationFlag,
+					iterationEndFlag,
+
 					paletteFlage,
 					framesFlag,
 					fpsFlag,
