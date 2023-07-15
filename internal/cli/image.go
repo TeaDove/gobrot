@@ -16,7 +16,7 @@ import (
 func drawImage(cCtx *cli.Context) error {
 	runtime.GOMAXPROCS(cCtx.Int(maxprocsFlag.Name))
 
-	colors, ok := palette.ColorPalettes[cCtx.String(paletteFlage.Name)]
+	colors, ok := palette.ColorPalettes[cCtx.String(paletteFlag.Name)]
 	if !ok {
 		return cli.Exit("Palette not found", 1)
 	}

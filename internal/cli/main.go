@@ -49,7 +49,7 @@ var (
 	radiusEndFlag    = &cli.Float64Flag{Name: "radius-end", Usage: "radius end value", Value: .125689}
 	iterationFlag    = &cli.IntFlag{Name: "iteration", Value: 800, Usage: "Iteration count"}
 	iterationEndFlag = &cli.IntFlag{Name: "iteration-end", Value: 800, Usage: "iteration end value"}
-	paletteFlage     = &cli.StringFlag{
+	paletteFlag      = &cli.StringFlag{
 		Name:  "palette",
 		Value: "Hippi",
 		Usage: strings.Join(palette.GetPaletteNames(), " | "),
@@ -64,10 +64,10 @@ var (
 		Value: "fractal.avi",
 		Usage: "Path to save image",
 	}
-	framesFlag = &cli.IntFlag{
-		Name:  "frames",
-		Value: 90,
-		Usage: "Amount of frames, to create in video",
+	secondsFlag = &cli.IntFlag{
+		Name:  "seconds",
+		Value: 3,
+		Usage: "Amount of to generate in video",
 	}
 	fpsFlag = &cli.IntFlag{Name: "fps",
 		Value: 30,
@@ -96,7 +96,7 @@ func Run() {
 				yposFlag,
 				radiusFlag,
 				iterationFlag,
-				paletteFlage,
+				paletteFlag,
 			}},
 			{
 				Name:   "video",
@@ -116,8 +116,8 @@ func Run() {
 					iterationFlag,
 					iterationEndFlag,
 
-					paletteFlage,
-					framesFlag,
+					paletteFlag,
+					secondsFlag,
 					fpsFlag,
 					videoFilenameFlag,
 				},

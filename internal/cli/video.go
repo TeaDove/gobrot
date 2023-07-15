@@ -26,7 +26,7 @@ func getStepInt(start, end, count int) int {
 func drawVideo(cCtx *cli.Context) error {
 	runtime.GOMAXPROCS(cCtx.Int(maxprocsFlag.Name))
 
-	colors, ok := palette.ColorPalettes[cCtx.String(paletteFlage.Name)]
+	colors, ok := palette.ColorPalettes[cCtx.String(paletteFlag.Name)]
 	if !ok {
 		return cli.Exit("Palette not found", 1)
 	}
@@ -48,7 +48,7 @@ func drawVideo(cCtx *cli.Context) error {
 		EscapeRadius: escapeRadius,
 	}
 
-	frames := cCtx.Int(framesFlag.Name)
+	frames := cCtx.Int(secondsFlag.Name) * cCtx.Int(fpsFlag.Name)
 	input, _ := brot.NewInputFromBuilderInput(&buildInput)
 
 	aw, err := mjpeg.New(cCtx.String(videoFilenameFlag.Name), int32(cCtx.Int(widthFlag.Name)), int32(cCtx.Int(heightFlag.Name)), int32(cCtx.Int(fpsFlag.Name)))

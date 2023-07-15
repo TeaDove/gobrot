@@ -68,6 +68,10 @@ $ gobrot -palette "Hippi" -xpos -0.00275 -ypos 1.012 -radius .089999 -file "test
 ```
 $ gobrot -palette "Hippi" -xpos -0.00275 -ypos 0.78912 -radius .1256789 -file "test5.png" -iteration 800 -step 6000 -smoothness 10 -width 1920 -height 1080
 ```
+```shell
+# video
+go run main.go video --width=2000 --height=2000 --fps=60 --seconds=3 --iteration=100 --iteration-end=800 --xpos-end=-0.06275 && open fractal.avi
+```
 
 By combining `-palette`, `-iteration` and `-step` values you can obtain differently colorized mandelbrot sets.
 
